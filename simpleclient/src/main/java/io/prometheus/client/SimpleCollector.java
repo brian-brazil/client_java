@@ -50,8 +50,33 @@ public abstract class SimpleCollector<Child, T extends SimpleCollector> extends 
   protected final String help;
   protected final List<String> labelNames;
 
-  protected final ConcurrentMap<List<String>, Child> children = new ConcurrentHashMap<List<String>, Child>();;
+  protected final ConcurrentMap<LabelValues, Child> children = new ConcurrentHashMap<LabelValues, Child>();;
   protected Child noLabelsChild;
+
+  protected static class LabelValues {
+    final String[] labelValues;
+    final int hash;
+
+    LabelValues(String[] labelValues) {
+      this.labelValues = labelValues;
+      hash = Arrays.hashCode(labelValues);
+    }
+    
+    @Override
+    public int hashCode() {
+      return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == null || !(obj instanceof LabelValues)) {
+        return false;
+      }
+      LabelValues other = (LabelValues) obj;
+      
+      return this.hash == other.hash && Arrays.equals(other.labelValues, this.labelValues);
+    }
+  }
 
   /**
    * Return the Child with the given labels, creating it if needed.
@@ -67,7 +92,7 @@ public abstract class SimpleCollector<Child, T extends SimpleCollector> extends 
         throw new IllegalArgumentException("Label cannot be null.");
       }
     }
-    List<String> key = Arrays.asList(labelValues);
+    LabelValues key = new LabelValues(labelValues);
     Child c = children.get(key);
     if (c != null) {
       return c;
@@ -82,7 +107,7 @@ public abstract class SimpleCollector<Child, T extends SimpleCollector> extends 
    * Any references to the Child are invalidated.
    */
   public void remove(String... labelValues) {
-    children.remove(Arrays.asList(labelValues));
+    children.remove(new LabelValues(labelValues));
     initializeNoLabelsChild();
   }
   
@@ -133,7 +158,7 @@ public abstract class SimpleCollector<Child, T extends SimpleCollector> extends 
     if (labelValues.length != labelNames.size()) {
       throw new IllegalArgumentException("Incorrect number of labels.");
     }
-    children.put(Arrays.asList(labelValues), child);
+    children.put(new LabelValues(labelValues), child);
     return (T)this;
   }
 

@@ -235,18 +235,6 @@ public class Histogram extends SimpleCollector<Histogram.Child, Histogram> {
   @Override
   public List<MetricFamilySamples> collect() {
     List<MetricFamilySamples.Sample> samples = new ArrayList<MetricFamilySamples.Sample>();
-    for(Map.Entry<List<String>, Child> c: children.entrySet()) {
-      Child.Value v = c.getValue().get();
-      List<String> labelNamesWithLe = new ArrayList<String>(labelNames);
-      labelNamesWithLe.add("le");
-      for (int i = 0; i < v.buckets.length; ++i) {
-        List<String> labelValuesWithLe = new ArrayList<String>(c.getKey());
-        labelValuesWithLe.add(doubleToGoString(buckets[i]));
-        samples.add(new MetricFamilySamples.Sample(fullname + "_bucket", labelNamesWithLe, labelValuesWithLe, v.buckets[i]));
-      }
-      samples.add(new MetricFamilySamples.Sample(fullname + "_count", labelNames, c.getKey(), v.buckets[buckets.length-1]));
-      samples.add(new MetricFamilySamples.Sample(fullname + "_sum", labelNames, c.getKey(), v.sum));
-    }
 
     MetricFamilySamples mfs = new MetricFamilySamples(fullname, Type.HISTOGRAM, help, samples);
     List<MetricFamilySamples> mfsList = new ArrayList<MetricFamilySamples>();

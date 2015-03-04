@@ -147,11 +147,6 @@ public class Summary extends SimpleCollector<Summary.Child, Summary> {
   @Override
   public List<MetricFamilySamples> collect() {
     List<MetricFamilySamples.Sample> samples = new ArrayList<MetricFamilySamples.Sample>();
-    for(Map.Entry<List<String>, Child> c: children.entrySet()) {
-      Child.Value v = c.getValue().get();
-      samples.add(new MetricFamilySamples.Sample(fullname + "_count", labelNames, c.getKey(), v.count));
-      samples.add(new MetricFamilySamples.Sample(fullname + "_sum", labelNames, c.getKey(), v.sum));
-    }
 
     MetricFamilySamples mfs = new MetricFamilySamples(fullname, Type.SUMMARY, help, samples);
     List<MetricFamilySamples> mfsList = new ArrayList<MetricFamilySamples>();

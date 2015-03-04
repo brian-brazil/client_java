@@ -139,9 +139,6 @@ public class Counter extends SimpleCollector<Counter.Child, Counter> {
   @Override
   public List<MetricFamilySamples> collect() {
     List<MetricFamilySamples.Sample> samples = new ArrayList<MetricFamilySamples.Sample>();
-    for(Map.Entry<List<String>, Child> c: children.entrySet()) {
-      samples.add(new MetricFamilySamples.Sample(fullname, labelNames, c.getKey(), c.getValue().get()));
-    }
     MetricFamilySamples mfs = new MetricFamilySamples(fullname, Type.COUNTER, help, samples);
 
     List<MetricFamilySamples> mfsList = new ArrayList<MetricFamilySamples>();
